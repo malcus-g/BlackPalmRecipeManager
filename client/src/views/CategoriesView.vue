@@ -29,25 +29,16 @@
         data(){
             return{
                 isLoading: false,
-                categories: [],
                 showModal: false
             }
         },
-        methods: {
-            getCategories(){
-                this.isLoading = true;
-                CategoryService.list()
-                    .then(response => {
-                        this.categories = response.data;
-                        this.isLoading = false;
-                    })
-                    .catch(error => {
-                        console.error(error.response.data)
-                    });
-            },
+        computed: {
+            categories(){
+                return this.$store.getters.categories;
+            }
         },
         created(){
-            this.getCategories();
+            this.$store.dispatch('setCategories');
         }
     }
 </script>

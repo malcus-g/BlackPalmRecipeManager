@@ -4,6 +4,7 @@ import axios from 'axios';
 // Service imports
 import RecipeService from '../services/RecipeService';
 import CollectionService from '../services/CollectionService';
+import CategoryService from '../services/CategoryService';
 
 export function createStore(currentToken, currentUser) {
   let store = _createStore({
@@ -11,7 +12,8 @@ export function createStore(currentToken, currentUser) {
       token: currentToken || '',
       user: currentUser || {},
       recipes: [],
-      collections: []
+      collections: [],
+      categories: []
     },
     getters: {
       recipes(state){
@@ -19,6 +21,9 @@ export function createStore(currentToken, currentUser) {
       },
       collections(state){
         return state.collections;
+      },
+      categories(state){
+        return state.categories;
       }
     },
     mutations: {
@@ -43,6 +48,9 @@ export function createStore(currentToken, currentUser) {
       },
       SET_COLLECTIONS(state, collections){
         state.collections = collections;
+      },
+      SET_CATEGORIES(state, categories){
+        state.categories = categories;
       }
     },
     actions: {
@@ -62,6 +70,15 @@ export function createStore(currentToken, currentUser) {
           })
           .catch(error => {
               console.error(error)
+          });
+      },
+      setCategories({ commit }){
+        CategoryService.list()
+          .then(response => {
+              commit('SET_CATEGORIES', response.data);
+          })
+          .catch(error => {
+              console.error(error.response.data)
           });
       }
     }
