@@ -3,13 +3,23 @@ import axios from 'axios';
 
 // Service imports
 import RecipeService from '../services/RecipeService';
+import CollectionService from '../services/CollectionService';
 
 export function createStore(currentToken, currentUser) {
   let store = _createStore({
     state: {
       token: currentToken || '',
       user: currentUser || {},
-      recipes: []
+      recipes: [],
+      collections: []
+    },
+    getters: {
+      recipes(state){
+        return state.recipes;
+      },
+      collections(state){
+        return state.collections;
+      }
     },
     mutations: {
       SET_AUTH_TOKEN(state, token) {
@@ -30,6 +40,9 @@ export function createStore(currentToken, currentUser) {
       },
       SET_RECIPES(state, recipes){
         state.recipes = recipes;
+      },
+      SET_COLLECTIONS(state, collections){
+        state.collections = collections;
       }
     },
     actions: {
@@ -40,6 +53,15 @@ export function createStore(currentToken, currentUser) {
           })
           .catch(error => {
               console.error(error.response.data);
+          });
+      },
+      setCollections({ commit }){
+        CollectionService.list()
+          .then(response => {
+              commit('SET_COLLECTIONS', response.data);
+          })
+          .catch(error => {
+              console.error(error)
           });
       }
     }

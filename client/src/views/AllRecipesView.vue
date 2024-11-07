@@ -34,7 +34,7 @@
         },
         computed: {
             recipes(){
-                return this.$store.state.recipes
+                return this.$store.getters.recipes;
             }
         },
         created(){

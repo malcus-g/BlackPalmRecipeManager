@@ -56,7 +56,13 @@ export default{
     },
     data(){
         return{
-            recipe: Object,
+            recipe: {
+                id: 0,
+                name: '',
+                collectionId: 0,
+                categoryId: 0,
+                imagePath: ''
+            },
             ingredients: [],
             instructions: [],
             isLoading: false,

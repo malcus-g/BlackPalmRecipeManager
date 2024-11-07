@@ -29,25 +29,16 @@ export default{
     data(){
         return{
             isLoading: false,
-            collections: [],
             showCreateModal: false
         }
     },
-    methods: {
-        getCollections(){
-            this.isLoading = true;
-            CollectionService.list()
-                .then(response => {
-                    this.collections = response.data;
-                    this.isLoading = false;
-                })
-                .catch(error => {
-                    console.error(error)
-                });
-        },
+    computed: {
+        collections(){
+            return this.$store.getters.collections;
+        }
     },
     created(){
-        this.getCollections();
+        this.$store.dispatch('setCollections');
     }
 }
 
