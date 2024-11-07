@@ -1,11 +1,15 @@
 import { createStore as _createStore } from 'vuex';
 import axios from 'axios';
 
+// Service imports
+import RecipeService from '../services/RecipeService';
+
 export function createStore(currentToken, currentUser) {
   let store = _createStore({
     state: {
       token: currentToken || '',
       user: currentUser || {},
+      recipes: []
     },
     mutations: {
       SET_AUTH_TOKEN(state, token) {
@@ -23,8 +27,22 @@ export function createStore(currentToken, currentUser) {
         state.token = '';
         state.user = {};
         axios.defaults.headers.common = {};
+      },
+      SET_RECIPES(state, recipes){
+        state.recipes = recipes;
       }
     },
+    actions: {
+      setRecipes({ commit }){
+        RecipeService.list()
+          .then(response => {
+              commit('SET_RECIPES', response.data);
+          })
+          .catch(error => {
+              console.error(error.response.data);
+          });
+      }
+    }
 
   })
   return store;

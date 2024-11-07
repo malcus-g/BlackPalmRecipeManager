@@ -29,25 +29,16 @@
         data(){
             return{
                 isLoading: false,
-                recipes: [],
                 showModal: false
             }
         },
-        methods: {
-            getRecipes(){
-                this.isLoading = true;
-                RecipeService.list()
-                    .then(response => {
-                        this.recipes = response.data;
-                        this.isLoading = false;
-                    })
-                    .catch(error => {
-                        console.error(error.response.data)
-                    });
-            },
+        computed: {
+            recipes(){
+                return this.$store.state.recipes
+            }
         },
         created(){
-            this.getRecipes();
+            this.$store.dispatch('setRecipes');
         }
     }
 </script>
