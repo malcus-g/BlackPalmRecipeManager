@@ -47,6 +47,7 @@
 import RecipeService from '../services/RecipeService';
 import CategoryService from '../services/CategoryService';
 import CollectionService from '../services/CollectionService';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     props: {
@@ -55,9 +56,17 @@ export default{
 
     data(){
         return{
-            recipe: {},
-            categories: [],
-            collections: []
+            recipe: {}
+        }
+    },
+
+    computed: {
+        categories(){
+            return this.$store.state.categories;
+        },
+
+        collections(){
+            return this.$store.state.collections;
         }
     },
 
@@ -69,7 +78,7 @@ export default{
                     this.recipe = response.data;
                 })
                 .catch(error => {
-                    console.error(error);
+                    ErrorHandler.handleError(error, 'getting current recipe');
                 });
         },
 
@@ -81,36 +90,15 @@ export default{
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
-                })
-        },
-
-        getCategories(){
-            CategoryService.list()
-                .then(response => {
-                    this.categories = response.data;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        },
-
-        getCollections(){
-            CollectionService.list()
-                .then(response => {
-                    this.collections = response.data;
-                })
-                .catch(error => {
-                    //TODO error handling
-                    console.error(error);
+                    ErrorHandler.handleError(error, 'updating recipe');
                 })
         }
     },
 
     created(){
         this.getCurrentRecipe();
-        this.getCategories();
-        this.getCollections();
+        this.$store.dispatch('setCategories');
+        this.$store.dispatch('setCollections');
     }
 }
 

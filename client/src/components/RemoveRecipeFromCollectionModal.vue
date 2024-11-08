@@ -29,6 +29,7 @@
 <script>
 import RecipeService from '../services/RecipeService';
 import CollectionService from '../services/CollectionService';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     props: {
@@ -49,8 +50,7 @@ export default{
                     this.recipes = response.data;
                 })
                 .catch(error => {
-                    //TODO error handling
-                    console.error(error.response.data)
+                    ErrorHandler.handleError(error, 'getting recipes in collection');
                 });
         },
 
@@ -64,7 +64,7 @@ export default{
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
+                    ErrorHandler.handleError(error, 'updating the collection');
                 })
         }
     },
