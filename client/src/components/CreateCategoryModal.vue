@@ -25,6 +25,7 @@
 
 <script >
 import CategoryService from '../services/CategoryService.js';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     props: {
@@ -40,16 +41,15 @@ export default{
     methods: {
       createNewCategory(){
         if(this.newCategory.name){
-          CategoryService.create(this.newCategory)
-            .then(() => {
-              this.newCategory.name = '';
-              this.$emit('close');
-              location.reload();
-            })
-            .catch(error => {
-              //TODO error handling
-              console.error(error);
-            });
+          this.$store.dispatch('addCategory', this.newCategory);
+          this.newCategory.name = '';
+          this.$emit('close');
+          // Should find a better way to handle refresh after the store action completes
+          setTimeout(() => {
+            location.reload();
+          }, 100);
+        }else{
+          window.alert('New category must have a name!')
         }
       }
     }

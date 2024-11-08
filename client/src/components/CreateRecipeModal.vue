@@ -56,51 +56,38 @@ export default{
                 categoryId: 0,
                 collectionId: 0,
                 imagePath: ''
-            },
-            categories: [],
-            collections: []
+            }
+        }
+    },
+
+    computed: {
+        categories(){
+            return this.$store.state.categories;
+        },
+        
+        collections(){
+            return this.$store.state.collections;
         }
     },
 
     methods: {
-        getCollections(){
-            CollectionService.list()
-                .then(response => {
-                    this.collections = response.data;
-                })
-                .catch(error => {
-                    //TODO error handling
-                    console.error(error);
-                })
-        },
-
-        getCategories(){
-            CategoryService.list()
-                .then(response => {
-                    this.categories = response.data;
-                })
-                .catch(error => {
-                    //TODO handle errors
-                    console.error(error);
-                });
-        },
-
         createNewRecipe(){
-            RecipeService.create(this.newRecipe)
-                .then(response => {
-                    this.newRecipe.name = '';
-                    this.newRecipe.categoryId = 0;
-                    this.newRecipe.collectionId = 0;
-                    this.newRecipe.imagePath = '';
-                    this.$emit('close');
-                    location.reload();
-                })
+            this.$store.dispatch('addRecipe', this.newRecipe);
+            this.newRecipe.name = '';
+            this.newRecipe.categoryId = 0;
+            this.newRecipe.collectionId = 0;
+            this.newRecipe.imagePath = '';
+            this.$emit('close');
+            setTimeout(() => {
+                location.reload();
+            }, 200)
+                
         }
     },
 
     created(){
-        this.getCollections();
-        this.getCategories();
+        this.$store.dispatch('setCategories');
+        this.$store.dispatch('setCollections');
     }
 }
 </script>

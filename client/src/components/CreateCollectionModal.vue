@@ -40,15 +40,15 @@ export default{
     methods: {
       createNewCollection(){
         if(this.newCollection.name){
-          CollectionService.createCollection(this.newCollection)
-            .then(response => {
-              this.newCollection.name = '';
-              this.$emit('close');
-              location.reload();
-            })
-            .catch(error => {
-              console.error(error);
-            });
+          this.$store.dispatch('addCollection', this.newCollection);
+          this.newCollection.name = '';
+          this.$emit('close');
+          // Should find a better way to handle refresh after the store action completes
+          setTimeout(() => {
+            location.reload();
+          }, 100)
+        }else{
+          window.alert('New collection must have a name!');
         }
       }
     }

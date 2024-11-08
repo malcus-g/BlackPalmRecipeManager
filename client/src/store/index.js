@@ -1,10 +1,11 @@
 import { createStore as _createStore } from 'vuex';
 import axios from 'axios';
 
-// Service imports
+// Service & Helper imports
 import RecipeService from '../services/RecipeService';
 import CollectionService from '../services/CollectionService';
 import CategoryService from '../services/CategoryService';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export function createStore(currentToken, currentUser) {
   let store = _createStore({
@@ -15,6 +16,7 @@ export function createStore(currentToken, currentUser) {
       collections: [],
       categories: []
     },
+
     getters: {
       recipes(state){
         return state.recipes;
@@ -26,6 +28,7 @@ export function createStore(currentToken, currentUser) {
         return state.categories;
       }
     },
+
     mutations: {
       SET_AUTH_TOKEN(state, token) {
         state.token = token;
@@ -51,8 +54,18 @@ export function createStore(currentToken, currentUser) {
       },
       SET_CATEGORIES(state, categories){
         state.categories = categories;
+      },
+      ADD_CATEGORY(state, category){
+        state.categories.push(category);
+      },
+      ADD_COLLECTION(state, collection){
+        state.collections.push(collection);
+      },
+      ADD_RECIPE(state, recipe){
+        state.recipes.push(recipe);
       }
     },
+
     actions: {
       setRecipes({ commit }){
         RecipeService.list()
@@ -60,7 +73,7 @@ export function createStore(currentToken, currentUser) {
               commit('SET_RECIPES', response.data);
           })
           .catch(error => {
-              console.error(error.response.data);
+              ErrorHandler.handleError(error, 'fetching recipes');
           });
       },
       setCollections({ commit }){
@@ -69,7 +82,7 @@ export function createStore(currentToken, currentUser) {
               commit('SET_COLLECTIONS', response.data);
           })
           .catch(error => {
-              console.error(error)
+              ErrorHandler.handleError(error, 'fetching collections');
           });
       },
       setCategories({ commit }){
@@ -78,11 +91,37 @@ export function createStore(currentToken, currentUser) {
               commit('SET_CATEGORIES', response.data);
           })
           .catch(error => {
-              console.error(error.response.data)
+              ErrorHandler.handleError(error, 'fetching categories');
+          });
+      },
+      addCategory({ commit }, newCategory){
+        CategoryService.create(newCategory)
+          .then(() => {
+            commit('ADD_CATEGORY', newCategory);
+          })
+          .catch(error => {
+            ErrorHandler.handleError(error, 'creating new categor');
+          });
+      },
+      addCollection({ commit }, newCollection){
+        CollectionService.createCollection(newCollection)
+          .then(() => {
+            commit('ADD_COLLECTION', newCollection);
+          })
+          .catch(error => {
+            ErrorHandler.handleError(error, 'creating new collection');
+          });
+      },
+      addRecipe({ commit }, newRecipe){
+        RecipeService.create(newRecipe)
+          .then(() => {
+            commit('ADD_RECIPE', newRecipe)
+          })
+          .catch(error => {
+            ErrorHandler.handleError(error, 'creating new recipe');
           });
       }
     }
-
   })
   return store;
 }
