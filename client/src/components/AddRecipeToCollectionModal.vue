@@ -36,22 +36,15 @@ export default{
 
     data(){
         return{
-            recipeToAdd: Object,
-            allRecipes: []
+            recipeToAdd: Object
         }
     },
-
+    computed: {
+        allRecipes(){
+            return this.$store.getters.recipes;
+        }
+    },
     methods: {
-        getRecipes(){
-            RecipeService.list()
-                .then(response => {
-                    this.allRecipes = response.data;
-                })
-                .catch(error => {
-                    console.error(error.response.data)
-                });
-        },
-
         updateCollection(){
             this.recipeToAdd.collectionId = this.$route.params.collectionId;
             RecipeService.update(this.recipeToAdd.id, this.recipeToAdd)
@@ -62,13 +55,38 @@ export default{
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
-                })
+                    // Check if error response is available and show relevant message to user
+                    if (error.response) {
+                        // Server responded with a status code out of the range of 2xx
+                        const status = error.response.status;
+                        let errorMessage;
+
+                        if (status === 400) {
+                            errorMessage = "Invalid recipe data. Please check your inputs.";
+                        } else if(status === 403){
+                            errorMessage = "You must be logged in as an admin for this!";
+                        } else if (status === 404) {
+                            errorMessage = "Recipe not found. It may have been removed.";
+                        } else if (status === 500) {
+                            errorMessage = "Server error. Please try again later.";
+                        } else {
+                            errorMessage = "An error occurred. Please try again.";
+                        }
+
+                        window.alert(errorMessage);
+                    } else if (error.request) {
+                        // Request was made but no response was received
+                        window.alert("Network error. Please check your connection.");
+                    } else {
+                        // Something else happened in setting up the request
+                        window.alert("An unexpected error occurred. Please try again.");
+                    }
+                });
         }
     },
 
     created(){
-        this.getRecipes();
+        this.$store.dispatch('setRecipes');
     }
 }
 </script>
