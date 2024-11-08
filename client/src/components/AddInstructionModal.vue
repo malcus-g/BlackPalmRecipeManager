@@ -31,6 +31,7 @@
 
 <script>
 import RecipeService from '../services/RecipeService';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     props: {
@@ -56,7 +57,7 @@ export default{
                     location.reload();
                 })
                 .catch(error => {
-                    console.error(error);
+                    ErrorHandler.handleError(error, "adding instruction");
                 });
         }
     }
