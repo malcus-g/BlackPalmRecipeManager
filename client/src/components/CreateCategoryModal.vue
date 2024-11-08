@@ -47,7 +47,7 @@ export default{
           // Should find a better way to handle refresh after the store action completes
           setTimeout(() => {
             location.reload();
-          }, 100);
+          }, 200);
         }else{
           window.alert('New category must have a name!')
         }

@@ -13,8 +13,8 @@
         </div>
         <h1 class="view-title">{{ collection.name }}</h1>
         <div id="main-content">
-            <loading-spinner id="spinner" :spin="isLoading"/>
-            <recipe-cards :recipes="recipes"></recipe-cards>
+            <loading-spinner v-if="isLoading" id="spinner" :spin="isLoading"/>
+            <recipe-cards v-else :recipes="recipes"></recipe-cards>
         </div>
     </div>
 </template>
@@ -25,6 +25,7 @@ import CollectionService from '../services/CollectionService';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import AddRecipeToCollectionModal from '../components/AddRecipeToCollectionModal.vue';
 import RemoveRecipeFromCollectionModal from '../components/RemoveRecipeFromCollectionModal.vue';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     components: {
@@ -35,7 +36,7 @@ export default{
     },
     data(){
         return{
-            isLoading: false,
+            isLoading: true,
             recipes: [],
             collection: '',
             showAddModal: false,
@@ -51,8 +52,7 @@ export default{
                     this.isLoading = false;
                 })
                 .catch(error => {
-                    //TODO error handling
-                    console.error(error.response.data)
+                    ErrorHandler.handleError(error, 'getting recipes in collection');
                 });
         },
 
@@ -62,28 +62,22 @@ export default{
                     this.collection = response.data;
                 })
                 .catch(error => {
-                    //TODO error handling
-                    console.error(error)
+                    ErrorHandler.handleError(error, 'getting the collection');
                 });
         },
 
         deleteCollection(){
-            if(window.confirm("Are you sure you want to delete this collection?")){
-                CollectionService.deleteCollection(this.$route.params.collectionId)
-                    .then(() => {
-                        //TODO notify user of collection deletion
-                        this.$router.push({name: "collections"})
-                    })
-                    .catch(error => {
-                        //TODO error handling
-                        console.error(error)
-                    })
+            if(window.confirm('Are you sure you want to delete this collection?')){
+                this.$store.dispatch('deleteCollection', this.$route.params.collectionId);
+                setTimeout(() => {
+                    this.$router.push({name: 'collections'});
+                }, 200);
             }
         }
     },
     created(){
-        this.getRecipes();
         this.getCollection();
+        this.getRecipes();
     }
 }
 </script>

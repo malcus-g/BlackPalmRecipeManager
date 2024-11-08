@@ -47,6 +47,7 @@ import RecipeService from '../services/RecipeService';
 import AddIngredientModal from '../components/AddIngredientModal.vue';
 import AddInstructionModal from '../components/AddInstructionModal.vue';
 import EditRecipeDetailsModal from '../components/EditRecipeDetailsModal.vue';
+import ErrorHandler from '../helpers/ErrorHandler';
 
 export default{
     components: {
@@ -65,7 +66,7 @@ export default{
             },
             ingredients: [],
             instructions: [],
-            isLoading: false,
+            isLoading: true,
             showIngredientModal: false,
             showInstructionModal: false,
             showRecipeDetailsModal: false
@@ -73,14 +74,13 @@ export default{
     },
     methods: {
         getRecipe(){
-            this.isLoading = true;
             RecipeService.get(this.$route.params.recipeId)
                 .then(response => {
                     this.recipe = response.data;
                     this.isLoading = false;
                 })
                 .catch(error => {
-                    console.error(error)
+                    ErrorHandler.handleError(error, 'getting recipe');
                 });
         },
 
@@ -92,7 +92,7 @@ export default{
                     this.isLoading = false;
                 })
                 .catch(error => {
-                    console.error(error);
+                    ErrorHandler.handleError(error, 'getting recipe ingredients');
                 });
         },
 
@@ -104,20 +104,14 @@ export default{
                     this.isLoading = false;
                 })
                 .catch(error => {
-                    console.error(error);
-                })
+                    ErrorHandler.handleError(error, 'getting recipe instructions');
+                });
         },
 
         deleteRecipe(){
             if(window.confirm("Are you sure you want to delete this recipe?")){
-                RecipeService.delete(this.$route.params.recipeId)
-                    .then(() => {
-                        this.$router.push({name: 'allRecipes'});
-                    })
-                    .catch(error => {
-                        //TODO error handling
-                        console.error(error);
-                    })
+                this.$store.dispatch('deleteRecipe', this.$route.params.recipeId);
+                this.$router.push({name: 'allRecipes'});
             }
         },
 
@@ -130,7 +124,7 @@ export default{
                         location.reload();
                     })
                     .catch(error => {
-                        console.error(error);
+                        ErrorHandler.handleError(error, 'removing ingredient from recipe');
                     });
             }
         },
@@ -144,8 +138,8 @@ export default{
                         location.reload();
                     })
                     .catch(error => {
-                        console.error(error);
-                    })
+                        ErrorHandler.handleError(error, 'removing instruction from recipe');
+                    });
             }
         }
     },

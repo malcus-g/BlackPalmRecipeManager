@@ -8,8 +8,8 @@
         </div>
         <h1 class="view-title">Recipes</h1>
         <div id="recipe-cards">
-            <loading-spinner id="spinner" :spin="isLoading"/>
-            <recipe-cards :recipes="recipes"></recipe-cards>
+            <loading-spinner id="spinner" :spin="isLoading" v-if="isLoading"/>
+            <recipe-cards :recipes="recipes" v-else></recipe-cards>
         </div>
     </div>
 </template>
@@ -28,7 +28,7 @@
         },
         data(){
             return{
-                isLoading: false,
+                isLoading: true,
                 showModal: false
             }
         },
@@ -37,8 +37,14 @@
                 return this.$store.getters.recipes;
             }
         },
+        methods: {
+            loadRecipes(){
+                this.$store.dispatch('setRecipes');
+                this.isLoading = false;
+            }
+        },
         created(){
-            this.$store.dispatch('setRecipes');
+           this.loadRecipes();
         }
     }
 </script>

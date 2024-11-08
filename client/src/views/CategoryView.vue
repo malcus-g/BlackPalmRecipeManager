@@ -1,12 +1,12 @@
 <template>
     <div id="category-view">
         <div id="buttons">
-            <font-awesome-icon class="fa-icon delete-category" :icon="['fa', 'square-minus']" @click="deleteCategory"/>    
+            <font-awesome-icon class="fa-icon delete-category" :icon="['fa', 'trash-can']" @click="deleteCategory"/>    
         </div>
         <h1 class="view-title">{{ category.name }}</h1>
         <div id="main-content">
-            <loading-spinner id="spinner" :spin="isLoading"/>
-            <recipe-cards :recipes="recipes"></recipe-cards>
+            <loading-spinner id="spinner" :spin="isLoading" v-if="isLoading"/>
+            <recipe-cards :recipes="recipes" v-else></recipe-cards>
         </div>
     </div>
 </template>
@@ -15,6 +15,7 @@
     import RecipeCards from '../components/RecipeCards.vue';
     import CategoryService from '../services/CategoryService.js';
     import LoadingSpinner from '../components/LoadingSpinner.vue';
+    import ErrorHandler from '../helpers/ErrorHandler';
 
     export default{
         components: {
@@ -23,21 +24,20 @@
         },
         data(){
             return{
-                isLoading: false,
+                isLoading: true,
                 recipes: [],
                 category: ''
             }
         },
         methods: {
             getRecipes(){
-                this.isLoading = true;
                 CategoryService.getCategoryRecipes(this.$route.params.categoryId)
                     .then(response => {
                         this.recipes = response.data;
                         this.isLoading = false;
                     })
                     .catch(error => {
-                        console.error(error.response.data)
+                        ErrorHandler.handleError(error, 'getting recipes in category');
                     });
             },
 
@@ -47,26 +47,22 @@
                         this.category = response.data;
                     })
                     .catch(error => {
-                        console.error(error.response.data)
+                        ErrorHandler.handleError(error, 'getting the category');
                     });
             },
 
             deleteCategory(){
                 if(window.confirm("Are you sure you want to delete this category?")){
-                    CategoryService.delete(this.$route.params.categoryId)
-                        .then(() => {
-                            this.$router.push({name: "categories"});
-                        })
-                        .catch(error => {
-                            //TODO error handling
-                            console.error(error);
-                        })
+                    this.$store.dispatch('deleteCategory', this.$route.params.categoryId);
+                    setTimeout(() => {
+                        this.$router.push({name: "categories"});
+                    }, 200)
                 }
             }
         },
         created(){
-            this.getRecipes();
             this.getCategory();
+            this.getRecipes();
         }
     }
 </script>

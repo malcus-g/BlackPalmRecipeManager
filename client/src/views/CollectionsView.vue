@@ -28,7 +28,7 @@ export default{
     },
     data(){
         return{
-            isLoading: false,
+            isLoading: true,
             showCreateModal: false
         }
     },
@@ -37,8 +37,14 @@ export default{
             return this.$store.getters.collections;
         }
     },
+    methods: {
+        loadCollections(){
+            this.$store.dispatch('setCollections');
+            this.isLoading = false;
+        }
+    },
     created(){
-        this.$store.dispatch('setCollections');
+        this.loadCollections();
     }
 }
 

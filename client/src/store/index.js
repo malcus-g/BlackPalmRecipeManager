@@ -120,6 +120,36 @@ export function createStore(currentToken, currentUser) {
           .catch(error => {
             ErrorHandler.handleError(error, 'creating new recipe');
           });
+      },
+      deleteCategory({ dispatch }, categoryId){
+        CategoryService.delete(categoryId)
+          .then(() => {
+            dispatch('setCategories');
+            window.alert("Category deleted!");
+          })
+          .catch(error => {
+            ErrorHandler.handleError(error, 'deleting category');
+          });
+      },
+      deleteCollection({ dispatch }, collectionId){
+        CollectionService.deleteCollection(collectionId)
+          .then(() => {
+              dispatch('setCollections');
+              window.alert('Collection deleted!');
+          })
+          .catch(error => {
+              ErrorHandler.handleError(error, 'deleting collection');
+          })
+      },
+      deleteRecipe({ dispatch }, recipeId){
+        RecipeService.delete(recipeId)
+          .then(() => {
+              dispatch('setRecipes');
+              window.alert('Recipe deleted!');
+          })
+          .catch(error => {
+              ErrorHandler.handleError(error, 'deleting recipe');
+          })
       }
     }
   })
